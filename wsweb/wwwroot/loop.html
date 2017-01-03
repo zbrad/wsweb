@@ -16,10 +16,20 @@
 
         function doConnect() {
             socket = new WebSocket(uri);
-            socket.onopen = function (e) { write("opened " + uri); };
-            socket.onclose = function (e) { write("closed"); socket = null; };
-            socket.onmessage = function (e) { write("Received: " + e.data); };
-            socket.onerror = function (e) { write("Error: " + e.data); };
+            socket.onopen = function (e) {
+                write("opened " + uri);
+            };
+            socket.onclose = function (e) {
+                write("closed");
+                socket = null;
+            };
+            socket.onmessage = function (e) {
+                write("Received: " + e.data);
+            };
+            socket.onerror = function (e) {
+                if (e.data)
+                    write("Error: " + e.data);
+            };
         }
 
         function doSendInput() {
