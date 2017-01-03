@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>websocket loop test</title>
+    <script language="javascript" type="text/javascript">
+        var socket = null;
+        var uri = "ws://" + window.location.host + "/ws";
+        var output;
+
+        function write(s) {
+            var p = document.createElement("p");
+            p.innerHTML = s;
+            output.appendChild(p);
+        }
+
+        function doConnect() {
+            socket = new WebSocket(uri);
+            socket.onopen = function (e) { write("opened " + uri); };
+            socket.onclose = function (e) { write("closed"); socket = null; };
+            socket.onmessage = function (e) { write("Received: " + e.data); };
+            socket.onerror = function (e) { write("Error: " + e.data); };
+        }
+
+        function doSendInput() {
+            if (socket == null) {
+                write("socket is not connected");
+                return;
+            }
+
+            var text = document.getElementById("sendInput").value;
+            write("Sending: " + text);
+            socket.send(text);
+        }
+
+        function onInit() {
+            output = document.getElementById("output");
+        }
+
+        function doDisconnect() {
+            socket.close();
+        }
+
+        window.onload = onInit;
+    </script>
+</head>
+<body>
+
+        <table>
+            <tr>
+                <td>
+                    <button onclick="doConnect()">Connect</button>
+                </td>
+                <td></td>
+                <td>
+                    <button onclick="doDisconnect()">Disconnect</button>
+                </td>
+            </tr>
+            <tr />
+            <tr>
+                <td>
+                    Text
+                </td>
+                <td><input type="text" id="sendInput" value="echo this" /></td>
+                <td>
+                    <button onclick="doSendInput()">Send</button>
+                </td>
+            </tr>
+        </table>
+
+    <hr/>
+    <div id="output"></div>
+</body>
+</html>
