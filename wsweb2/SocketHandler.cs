@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-
+using System.Text;
 using System.Net.WebSockets;
 using System.Threading;
 using Microsoft.AspNetCore.Builder;
@@ -14,6 +14,7 @@ namespace wsweb2
         public const int BufferSize = 4096;
 
         WebSocket socket;
+        static readonly Encoding utf8 = Encoding.UTF8;
 
         SocketHandler(WebSocket socket)
         {
@@ -28,7 +29,13 @@ namespace wsweb2
             while (this.socket.State == WebSocketState.Open)
             {
                 var incoming = await this.socket.ReceiveAsync(seg, CancellationToken.None);
-                var outgoing = new ArraySegment<byte>(buffer, 0, incoming.Count);
+
+                // show how to use the input and change the response
+                var input = utf8.GetString(buffer, 0, incoming.Count);  // convert buffer to string
+                var s = $"echo: {input}";            // add echo prefix
+                var b = utf8.GetBytes(s);            // create outgoing bytes
+
+                var outgoing = new ArraySegment<byte>(b);
                 await this.socket.SendAsync(outgoing, WebSocketMessageType.Text, true, CancellationToken.None);
             }
         }
